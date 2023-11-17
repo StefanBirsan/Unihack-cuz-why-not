@@ -5,6 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { CommonActions } from '@react-navigation/native';
+import MapView, {Callout, Marker} from "react-native-maps";
+
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -26,7 +28,7 @@ const LoginButton = ({ navigation }) => {
           style={styles.loginButton}
           onPress={handleLoginPress}
       >
-        <Text style={styles.customButtonText}>Login</Text>
+        <Text style={styles.lButtonText}>Login</Text>
       </TouchableOpacity>
   );
 };
@@ -34,11 +36,11 @@ const LoginButton = ({ navigation }) => {
 const HomeScreen = ({ navigation }) => {
   return (
       <LinearGradient
-          colors={['#884fcc', '#3fcffb', '#af1ddd']}
+          colors={['#000000', '#A55233']}
           style={styles.container}
       >
         <Text style={styles.textStyle}>
-          {"The dumb truck\n"}
+          {"Dump Alert\n"}
         </Text>
 
         <CustomButton />
@@ -54,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
 const SecondScreen = ({ navigation }) => {
   return (
       <LinearGradient
-          colors={['#884fcc', '#3fcffb', '#af1ddd']}
+          colors={['#000000', '#A55233']}
           style={styles.container}
       >
         <TouchableOpacity
@@ -70,13 +72,47 @@ const SecondScreen = ({ navigation }) => {
 const LoginScreen = () => {
   return (
       <LinearGradient
-          colors={['#884fcc', '#3fcffb', '#af1ddd']}
+          colors={['#000000', '#A55233']}
           style={styles.container}
       >
         {/* Your Login Screen components go here */}
         <Text style={styles.textStyle}>Welcome to the Login Screen</Text>
       </LinearGradient>
   );
+};
+
+const MapScreen = () => {
+    const onRegionChange = (region) => {
+        console.log(region);
+    };
+
+    return (
+        <View style={styles.container}>
+            <MapView
+                style={styles.map}
+                onRegionChange={onRegionChange}
+                initialRegion={{
+                  latitude: 45.7494,
+                    longitude: 21.2272,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+            >
+            <Marker
+                coordinate={{
+                    latitude: 45.7494,
+                    longitude: 21.2272,
+                }}
+                pinColor="black"
+            >
+                <Callout>
+                    <Text>Ma-ta</Text>
+                </Callout>
+            </Marker>
+
+            </MapView>    
+        </View>
+    );
 };
 
 const CustomButton = () => {
@@ -98,7 +134,8 @@ export default function App() {
         >
           <Tab.Screen name="Home" component={HomeScreen} />
           <Tab.Screen name="Second" component={SecondScreen} />
-          <Tab.Screen name="Login" component={LoginScreen} />
+          <Tab.Screen name="Login" component={LoginScreen}/>
+          <Tab.Screen name="Map" component={MapScreen} />
         </Tab.Navigator>
       </NavigationContainer>
   );
@@ -113,7 +150,7 @@ const styles = StyleSheet.create({
   textStyle: {
     fontStyle: 'italic',
     fontSize: 22,
-    color: '#070708',
+    color: '#fff',
     textAlign: 'center',
   },
   customButtonContainer: {
@@ -132,10 +169,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 50, // Adjust top position as needed
     right: 10, // Adjust right position as needed
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
     borderRadius: 15,
     padding: 10,
     width: 100, // Adjust width as needed
     alignItems: 'center',
   },
+    lButtonText: {
+    color: 'black',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    map: {
+        width: '100%',
+        height: '100%',
+    },
 });
