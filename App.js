@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View, Image, TextInput} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,6 +10,20 @@ import {GooglePlacesAutocomplete} from "react-native-google-places-autocomplete"
 
 
 const Tab = createMaterialTopTabNavigator();
+
+const CustomTextInput = ({ placeholder, secureTextEntry, onChangeText, value }) => {
+    return (
+        <View style={styles.inputContainer}>
+            <TextInput
+                style={styles.input}
+                placeholder={placeholder}
+                secureTextEntry={secureTextEntry}
+                onChangeText={onChangeText}
+                value={value}
+            />
+        </View>
+    );
+};
 
 const CustomButton = () => {
     return (
@@ -93,15 +107,44 @@ const SecondScreen = ({ navigation }) => {
 };
 
 const LoginScreen = () => {
-  return (
-      <LinearGradient
-          colors={['#000000', '#A55233']}
-          style={styles.container}
-      >
-        {/* Your Login Screen components go here */}
-        <Text style={styles.textStyle}>Welcome to the Login Screen</Text>
-      </LinearGradient>
-  );
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = () => {
+        // Handle the login logic here
+        console.log('Username:', username);
+        console.log('Password:', password);
+    };
+
+    return (
+        <View style={styles.container}>
+            <Text style={styles.titleL}>Login</Text>
+
+            {/* Use the custom text input component */}
+            <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Username</Text>
+                <CustomTextInput
+                    placeholder="Enter your username"
+                    onChangeText={(text) => setUsername(text)}
+                    value={username}
+                />
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <CustomTextInput
+                    placeholder="Enter your password"
+                    secureTextEntry
+                    onChangeText={(text) => setPassword(text)}
+                    value={password}
+                />
+            </View>
+
+            <TouchableOpacity style={styles.loginButt} onPress={handleLogin}>
+                <Text style={styles.loginButtonText}>Login</Text>
+            </TouchableOpacity>
+        </View>
+    );
 };
 
 
@@ -221,7 +264,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   customButtonContainer: {
-    backgroundColor: 'blue',
+    backgroundColor: '#3d4737',
     borderRadius: 20,
     padding: 15,
     width: 200,
@@ -297,5 +340,27 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         marginBottom: 20,
     },
-
+    titleL: {
+        fontSize: 24,
+        marginBottom: 16,
+    },
+    inputContainer: {
+        marginBottom: 20,
+        width: '100%', // Make the input container take the full width
+    },
+    inputLabel: {
+        fontSize: 16,
+        marginBottom: 8,
+    },
+    loginButt: {
+        backgroundColor: 'blue',
+        borderRadius: 8,
+        padding: 12,
+        marginTop: 16,
+    },
+    loginButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
