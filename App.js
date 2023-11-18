@@ -25,13 +25,17 @@ const CustomTextInput = ({ placeholder, secureTextEntry, onChangeText, value }) 
     );
 };
 
-const CustomButton = () => {
+const CustomButton = ({ title, message }) => {
+    const handleButtonPress = () => {
+        Alert.alert(title, message);
+    };
+
     return (
         <TouchableOpacity
             style={styles.customButtonContainer}
-            onPress={() => Alert.alert('Mi scarba de tine', 'Fuck off mate.')}
+            onPress={handleButtonPress}
         >
-            <Text style={styles.customButtonText}>Ce ai cu button-u meu bah?</Text>
+            <Text style={styles.customButtonText}>{title}</Text>
         </TouchableOpacity>
     );
 };
@@ -75,8 +79,8 @@ const HomeScreen = ({ navigation }) => {
 
               <View style={styles.centeredSection}>
                   <View style={styles.buttonRow}>
-                      <CustomButton />
-                      <CustomButton />
+                      <CustomButton title = "FRQ" message="nothing much atm"/>
+                      <CustomButton title = "Info" message="nothing much atm"/>
                   </View>
               </View>
 
@@ -117,7 +121,10 @@ const LoginScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <LinearGradient
+            colors={['#000000', '#A55233']}
+            style={styles.container}
+        >
             <Text style={styles.titleL}>Login</Text>
 
             {/* Use the custom text input component */}
@@ -140,10 +147,20 @@ const LoginScreen = () => {
                 />
             </View>
 
+            <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <CustomTextInput
+                    placeholder="Enter your password"
+                    secureTextEntry
+                    onChangeText={(text) => setPassword(text)}
+                    value={password}
+                />
+            </View>
+
             <TouchableOpacity style={styles.loginButt} onPress={handleLogin}>
                 <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
-        </View>
+        </LinearGradient>
     );
 };
 
@@ -225,7 +242,7 @@ const MapScreen = () => {
                 }}
             >
                 <Callout>
-                    <Text>Ma-ta</Text>
+                    <Text>Hello there</Text>
                 </Callout>
             </Marker>
 
@@ -343,10 +360,12 @@ const styles = StyleSheet.create({
     titleL: {
         fontSize: 24,
         marginBottom: 16,
+        color: 'white',
     },
     inputContainer: {
         marginBottom: 20,
         width: '100%', // Make the input container take the full width
+        backgroundColor: 'white',
     },
     inputLabel: {
         fontSize: 16,
