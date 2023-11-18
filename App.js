@@ -1,14 +1,26 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View, Image, TextInput} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { CommonActions } from '@react-navigation/native';
 import MapView, {Callout, Marker} from "react-native-maps";
+import {GooglePlacesAutocomplete} from "react-native-google-places-autocomplete";
 
 
 const Tab = createMaterialTopTabNavigator();
+
+const CustomButton = () => {
+    return (
+        <TouchableOpacity
+            style={styles.customButtonContainer}
+            onPress={() => Alert.alert('Mi scarba de tine', 'Fuck off mate.')}
+        >
+            <Text style={styles.customButtonText}>Ce ai cu button-u meu bah?</Text>
+        </TouchableOpacity>
+    );
+};
 
 const LoginButton = ({ navigation }) => {
   const handleLoginPress = () => {
@@ -35,21 +47,32 @@ const LoginButton = ({ navigation }) => {
 
 const HomeScreen = ({ navigation }) => {
   return (
-      <LinearGradient
-          colors={['#000000', '#A55233']}
-          style={styles.container}
+      <ImageBackground
+          source={require('./pateu/background.jpg')}
+          style={styles.containerImg}
       >
-        <Text style={styles.textStyle}>
-          {"Dump Alert\n"}
-        </Text>
+          <View style={styles.overlay}>
+              <View style={styles.upperSection}>
+                  <Image
+                      source={require('./pateu/title.png')}
+                      style={styles.logoImage}
+                  />
+              </View>
 
-        <CustomButton />
+              <View style={styles.centeredSection}>
+                  <View style={styles.buttonRow}>
+                      <CustomButton />
+                      <CustomButton />
+                  </View>
+              </View>
 
-        {/* Add the LoginButton component */}
-        <LoginButton navigation={navigation} />
+              <View style={styles.topRightSection}>
+                  <LoginButton navigation={navigation} />
+              </View>
 
-        <StatusBar style="auto" />
-      </LinearGradient>
+              <StatusBar style="auto" />
+          </View>
+      </ImageBackground>
   );
 };
 
@@ -81,13 +104,52 @@ const LoginScreen = () => {
   );
 };
 
+
 const MapScreen = () => {
     const onRegionChange = (region) => {
         console.log(region);
     };
 
+    const [region, setRegion] = React.useState({
+        latitude: 45.7494,
+        longitude: 21.2272,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+    });
+
+
     return (
-        <View style={styles.container}>
+        <View style={styles.containerMap}>
+            <GooglePlacesAutocomplete
+                placeholder='Search'
+                fetchDetails={true}
+                GooglePlacesSearchQuery={{
+                    rankby: 'distance',
+                }}
+                onPress={(data, details = null) => {
+                    console.log('Data:', data);
+                    setRegion({
+                        latitude: details.geometry.location.lat,
+                        longitude: details.geometry.location.lng,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+
+                    })
+                }}
+                onFail={(error) => console.error('Places Autocomplete Error:', error)}
+                query={{
+                    key: "AIzaSyCZpueyVlrCjIWW7OixQRA0U9iAgLeAk3s",
+                    language: "en",
+                    components: "country:ro",
+                    types: ['establishment', 'address'],
+                    radius: 30000,
+                    location: `${region.latitude},${region.longitude}`,
+                }}
+                styles={{
+                    container: { flex: 0, position: 'absolute', width: '100%' , zIndex: 1},
+                    listView: { backgroundColor: 'white' },
+                }}
+            />
             <MapView
                 style={styles.map}
                 onRegionChange={onRegionChange}
@@ -97,34 +159,39 @@ const MapScreen = () => {
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                 }}
+                provider="google"
             >
+            <Marker coordinate={{
+                latitude: region.latitude,
+                longitude: region.longitude,
+            }}
+            />
+
             <Marker
                 coordinate={{
                     latitude: 45.7494,
                     longitude: 21.2272,
                 }}
                 pinColor="black"
+                draggable={true}
+                onDragStart={(e) => {
+                    console.log('Drag Start', e.nativeEvent.coordinate)
+                }}
+                onDragEnd={(e) => {
+                    console.log('Drag End', e.nativeEvent.coordinate)
+                }}
             >
                 <Callout>
                     <Text>Ma-ta</Text>
                 </Callout>
             </Marker>
 
-            </MapView>    
+            </MapView>
         </View>
     );
 };
 
-const CustomButton = () => {
-  return (
-      <TouchableOpacity
-          style={styles.customButtonContainer}
-          onPress={() => Alert.alert('Mi scarba de tine', 'Fuck off mate.')}
-      >
-        <Text style={styles.customButtonText}>Ce ai cu button-u meu bah?</Text>
-      </TouchableOpacity>
-  );
-};
+
 
 export default function App() {
   return (
@@ -183,5 +250,52 @@ const styles = StyleSheet.create({
     map: {
         width: '100%',
         height: '100%',
+
     },
+    containerMap: {
+       flex: 1,
+       marginTop: 35,
+    },
+    containerImg: {
+        flex: 1,
+
+    },
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adjust the overlay color and transparency as needed
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textSM: {
+        color: 'white',
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    upperSection: {
+        alignItems: 'center',
+        paddingTop: 125, // Increase the paddingTop to add more space
+    },
+    centeredSection: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+    },
+    topRightSection: {
+        position: 'absolute',
+        top: 0,
+        right: 20,
+    },
+    logoImage: {
+        width: 200,
+        height: 200,
+        resizeMode: 'contain',
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        marginBottom: 20,
+    },
+
 });
