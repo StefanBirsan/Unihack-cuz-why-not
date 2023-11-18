@@ -1,3 +1,18 @@
+const CustomTextInput = ({ placeholder, secureTextEntry, onChangeText, value }) => {
+    return (
+        <View style={styles.inputContainer}>
+            <TextInput
+                style={styles.input}
+                placeholder={placeholder}
+                secureTextEntry={secureTextEntry}
+                onChangeText={onChangeText}
+                value={value}
+            />
+        </View>
+    );
+};
+
+
 const LoginScreen = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
