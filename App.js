@@ -1,37 +1,42 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import {Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View, Image, TextInput} from 'react-native';
+import {Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { CommonActions } from '@react-navigation/native';
 import MapView, {Callout, Marker} from "react-native-maps";
 import {GooglePlacesAutocomplete} from "react-native-google-places-autocomplete";
+import LoginScreen  from "./LoginScreen";
+import {onAuthStateChanged, User} from "firebase/auth";
+import {FIREBASE_AUTH} from "./firebase";
 
 
-const Tab = createMaterialTopTabNavigator();
 
-const CustomTextInput = ({ placeholder, secureTextEntry, onChangeText, value }) => {
+const Stack = createStackNavigator();
+
+const InsideStack = createStackNavigator();
+
+function InsideLayout() {
     return (
-        <View style={styles.inputContainer}>
-            <TextInput
-                style={styles.input}
-                placeholder={placeholder}
-                secureTextEntry={secureTextEntry}
-                onChangeText={onChangeText}
-                value={value}
-            />
-        </View>
-    );
-};
+        <InsideStack.Navigator>
+            <InsideStack.Screen name="Second" component={SecondScreen} />
+        </InsideStack.Navigator>
 
-const CustomButton = () => {
+    );
+}
+
+const CustomButton = ({ title, message }) => {
+    const handleButtonPress = () => {
+        Alert.alert(title, message);
+    };
+
     return (
         <TouchableOpacity
             style={styles.customButtonContainer}
-            onPress={() => Alert.alert('Mi scarba de tine', 'Fuck off mate.')}
+            onPress={handleButtonPress}
         >
-            <Text style={styles.customButtonText}>Ce ai cu button-u meu bah?</Text>
+            <Text style={styles.customButtonText}>{title}</Text>
         </TouchableOpacity>
     );
 };
@@ -75,8 +80,8 @@ const HomeScreen = ({ navigation }) => {
 
               <View style={styles.centeredSection}>
                   <View style={styles.buttonRow}>
-                      <CustomButton />
-                      <CustomButton />
+                      <CustomButton title = "FRQ" message="nothing much atm"/>
+                      <CustomButton title = "Info" message="nothing much atm"/>
                   </View>
               </View>
 
@@ -91,64 +96,40 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const SecondScreen = ({ navigation }) => {
-  return (
-      <LinearGradient
-          colors={['#000000', '#A55233']}
-          style={styles.container}
-      >
-        <TouchableOpacity
-            style={styles.customButtonContainer}
-            onPress={() => navigation.navigate('Home')}
-        >
-          <Text style={styles.customButtonText}>Go to First Screen</Text>
-        </TouchableOpacity>
-      </LinearGradient>
-  );
-};
-
-const LoginScreen = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-
-    const handleLogin = () => {
-        // Handle the login logic here
-        console.log('Username:', username);
-        console.log('Password:', password);
+    const handleGoToMapPress = () => {
+        navigation.navigate('Map');
+    };
+    const goToHomeScreen = () => {
+        navigation.navigate('Home');
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.titleL}>Login</Text>
+        <LinearGradient colors={['#000000', '#A55233']} style={styles.container}>
+            <View style={styles.buttonRow}>
+                <TouchableOpacity
+                    style={[styles.customButtonContainer, styles.customButtonContainer]}
+                    onPress={goToHomeScreen}
+                >
+                    <Text style={[styles.customButtonText, styles.customBT]}>
+                        Go to Home Screen
+                    </Text>
+                </TouchableOpacity>
 
-            {/* Use the custom text input component */}
-            <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Username</Text>
-                <CustomTextInput
-                    placeholder="Enter your username"
-                    onChangeText={(text) => setUsername(text)}
-                    value={username}
-                />
+                <TouchableOpacity
+                    style={[styles.customButtonContainer, styles.customButtonContainer]}
+                    onPress={handleGoToMapPress}
+                >
+                    <Text style={[styles.customButtonText, styles.customBT]}>
+                        Go to Map Screen
+                    </Text>
+                </TouchableOpacity>
             </View>
-
-            <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Password</Text>
-                <CustomTextInput
-                    placeholder="Enter your password"
-                    secureTextEntry
-                    onChangeText={(text) => setPassword(text)}
-                    value={password}
-                />
-            </View>
-
-            <TouchableOpacity style={styles.loginButt} onPress={handleLogin}>
-                <Text style={styles.loginButtonText}>Login</Text>
-            </TouchableOpacity>
-        </View>
+        </LinearGradient>
     );
 };
 
 
-const MapScreen = () => {
+const MapScreen = ({navigation}) => {
     const onRegionChange = (region) => {
         console.log(region);
     };
@@ -160,6 +141,9 @@ const MapScreen = () => {
         longitudeDelta: 0.0421,
     });
 
+    const handleGoBackToSecondPress = () => {
+        navigation.navigate('Second');
+    };
 
     return (
         <View style={styles.containerMap}>
@@ -225,11 +209,19 @@ const MapScreen = () => {
                 }}
             >
                 <Callout>
-                    <Text>Ma-ta</Text>
+                    <Text>Hello there</Text>
                 </Callout>
             </Marker>
 
             </MapView>
+
+            <TouchableOpacity
+                style={styles.goBackButton}
+                onPress={handleGoBackToSecondPress}
+            >
+                <Text style={styles.goBackButtonText}>Go back to the main screen</Text>
+            </TouchableOpacity>
+
         </View>
     );
 };
@@ -237,18 +229,43 @@ const MapScreen = () => {
 
 
 export default function App() {
-  return (
-      <NavigationContainer>
-        <Tab.Navigator
-            tabBar={() => null} // Add this line
-        >
-          <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="Second" component={SecondScreen} />
-          <Tab.Screen name="Login" component={LoginScreen}/>
-          <Tab.Screen name="Map" component={MapScreen} />
-        </Tab.Navigator>
-      </NavigationContainer>
-  );
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        onAuthStateChanged(FIREBASE_AUTH, (user) => {
+            console.log('user', user);
+            setUser(user);
+        });
+    }, []);
+
+    return (
+        <NavigationContainer>
+            <Stack.Navigator
+                initialRouteName={user ? 'Second' : 'Login'}
+                headerMode="none"
+            >
+                {user ? (
+                    // Authenticated screens
+                    <>
+                        <Stack.Screen name="Second" component={SecondScreen} />
+                        {/* Add other authenticated screens here */}
+                    </>
+                ) : (
+                    // Non-authenticated screens
+                    <>
+                        <Stack.Screen
+                            name="Login"
+                            component={LoginScreen}
+                            options={{ headerShown: false }}
+                        />
+                        {/* Include other screens for non-authenticated state here */}
+                    </>
+                )}
+
+                <Stack.Screen name="Map" component={MapScreen} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -343,10 +360,12 @@ const styles = StyleSheet.create({
     titleL: {
         fontSize: 24,
         marginBottom: 16,
+        color: 'white',
     },
     inputContainer: {
         marginBottom: 20,
         width: '100%', // Make the input container take the full width
+        backgroundColor: 'white',
     },
     inputLabel: {
         fontSize: 16,
@@ -362,5 +381,27 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    goBackButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 8,
+        alignItems: 'center',
+    },
+    goBackButtonText: {
+        color: 'black',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    buttonRowf: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 20,
+    },
+    customBT: {
+        fontSize: 16, // Adjusted font size for smaller text
     },
 });
