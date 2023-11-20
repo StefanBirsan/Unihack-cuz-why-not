@@ -1,3 +1,3 @@
 # Unihack-cuz-why-not
-guys aici punem chestiile
-ok
+
+This readme does not exist. 404 
